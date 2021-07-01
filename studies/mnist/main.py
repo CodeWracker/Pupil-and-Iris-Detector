@@ -1,10 +1,11 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
-
+import time
+from tensorflow.keras.callbacks import TensorBoard
 print(tf.__version__)
 
-NAME = f'Cats-vs-dogs-64x2-CNN-{int(time.time())}'
+NAME = f'mnist-28x28-cnn-{int(time.time())}'
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -55,9 +56,10 @@ model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy', metri
 
 print(model.summary())
 
+#tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
 
-
-model.fit(x_train, y_train, epochs=3) 
+model.fit(x_train, y_train,
+          epochs=10)
 
 print(x_test[67].shape)
 plt.imshow(x_test[67].reshape(28,28),cmap=plt.cm.binary)
