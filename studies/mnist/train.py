@@ -58,10 +58,13 @@ def train():
 
   print(model.summary())
 
-  #tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+  tensorboard = tf.keras.callbacks.TensorBoard(log_dir="logs/{}".format(NAME))
 
-  model.fit(x_train, y_train,
-            epochs=5)
+  model.fit(x = x_train,
+            y =  y_train,
+            epochs =5,
+            validation_data=(x_test,y_test),
+            callbacks = [tensorboard] )
 
   print(x_test[67].shape)
   plt.imshow(x_test[67].reshape(28,28),cmap=plt.cm.binary)
