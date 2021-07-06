@@ -38,7 +38,7 @@ def train():
 
   model= tf.keras.models.Sequential()
 
-  model.add(tf.keras.layers.Convolution2D(nb_filters,(nb_conv,nb_conv),input_shape=(28,28,1)))
+  model.add(tf.keras.layers.Convolution2D(nb_filters,(nb_conv,nb_conv),padding="same",input_shape=(28,28,1)))
   model.add(tf.keras.layers.Activation('relu'))
 
 
