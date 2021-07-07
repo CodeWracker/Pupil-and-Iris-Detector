@@ -1,3 +1,4 @@
 studies/*/data/*
 cnn-synth-eye-detector/data/*
 cnn-synth-eye-detector/processed/results.pickle
+cnn-synth-eye-detector/models/*

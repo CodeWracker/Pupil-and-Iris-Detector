@@ -13,7 +13,7 @@ import math
 
 
 def train():
-    #print(tf.__version__)
+    print(tf.__version__)
 
     NAME = f'eye-cambrige-80x120-cnn-{int(time.time())}'
     
@@ -24,10 +24,10 @@ def train():
     images = np.array(data['image'])
     #print(images.shape)
     X,Y,Ri,Rp = np.array(data['x_eye']),np.array(data['y_eye']),np.array(data['iris_radius']),np.array(data['pupil_radius'])
-    X = X/120
-    Y = Y/80
-    Ri = Ri/120
-    Rp = Rp/120
+    #X = X/120
+    #Y = Y/80
+    #Ri = Ri/120
+    #Rp = Rp/120
     y = []
     for i in range(0,len(X)):
         y.append(np.array([X[i],Y[i],Ri[i],Rp[i]]))
@@ -56,11 +56,11 @@ def train():
 
     model= tf.keras.models.Sequential()
 
-    model.add(tf.keras.layers.Convolution2D(nb_filters,(nb_conv,nb_conv),padding="same",input_shape=x_train[0].shape))
+    model.add(tf.keras.layers.Convolution2D(32,(3,3),input_shape=x_train[0].shape))
     model.add(tf.keras.layers.Activation('relu'))
 
 
-    model.add(tf.keras.layers.Convolution2D(nb_filters,(nb_conv,nb_conv)))
+    model.add(tf.keras.layers.Convolution2D(32,(3,3)))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(tf.keras.layers.Dropout(0.2))
 
@@ -76,15 +76,15 @@ def train():
 
     print(model.summary())
 
-    #tensorboard = tf.keras.callbacks.TensorBoard(log_dir="logs/{}".format(NAME))
+    tensorboard = tf.keras.callbacks.TensorBoard(log_dir="logs/{}".format(NAME))
 
     model.fit(x = x_train,
                 y =  y_train,
-                epochs =2)
-    #         ,
-    #           validation_data=(x_test,y_test),
-    #           callbacks = [tensorboard] )
-
+                epochs =10,
+               validation_data=(x_test,y_test),
+               callbacks = [tensorboard] )
+    
+    model.save('models/'+NAME)
     print(x_test[67].shape)
     plt.imshow(x_test[67].reshape(80,120),cmap='gray')
     plt.show()
@@ -93,10 +93,20 @@ def train():
     predictions = model.predict(aux_x)
     print(predictions)
     predictions = predictions[0]
-    x_eye = int(math.sqrt(int(predictions[0] * 120)**2))
-    y_eye = int(math.sqrt(int(predictions[1] * 80)**2))
-    rd_iris = int(math.sqrt(int(predictions[2] * 120)**2))
-    rd_pupil = int(math.sqrt(int(predictions[2] * 120)**2))
+
+
+    x_eye = int(math.sqrt((predictions[0] )**2))
+    y_eye = int(math.sqrt((predictions[1])**2))
+    rd_iris = int(math.sqrt((predictions[2] )**2))
+    rd_pupil = int(math.sqrt((predictions[3] )**2))
+
+    '''x_eye = int(math.sqrt((predictions[0] * 120 )**2))
+    y_eye = int(math.sqrt((predictions[1] * 80 )**2))
+    rd_iris = int(math.sqrt((predictions[2]  * 120)**2))
+    rd_pupil = int(math.sqrt((predictions[3] * 120 )**2))'''
+
+
+
     print("Results")
     print(x_eye,y_eye,rd_iris,rd_pupil)
     img = x_test[67].reshape(80,120)
@@ -105,7 +115,6 @@ def train():
     cv2.imshow("Img",img)
     
     cv2.waitKey(0)
-    model.save('models/'+NAME)
 
 if __name__ == "__main__":
     train()
