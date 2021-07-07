@@ -28,7 +28,11 @@ def train():
   x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2],1)
   print()
   print(x_train.shape)
+  print(y_train.shape)
   print(x_test.shape)
+  print(y_test.shape)
+  print()
+  print(y_train[0])
 
   # aqui eu dei uma modificada do cod la em baixo pra usar cnn
 

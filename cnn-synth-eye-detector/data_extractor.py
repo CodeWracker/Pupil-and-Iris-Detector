@@ -44,7 +44,7 @@ def get_image_data(path_plk,path_image):
     df['file_name'] = np.array([ path_image.split('.png')[0] ])
     
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = (img.reshape(9600,))
+    img = (img.reshape(80,120,1))
     return x_iris,y_iris,r_pupil,r_iris,path_image.split('.png')[0],img
 
 def save_df(x_iris,y_iris,r_pupil,r_iris,path_image):
