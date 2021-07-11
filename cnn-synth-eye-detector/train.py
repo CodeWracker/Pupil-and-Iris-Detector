@@ -1,3 +1,6 @@
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,18 +59,18 @@ def train():
 
     model= tf.keras.models.Sequential()
 
-    model.add(tf.keras.layers.Convolution2D(32,(3,3),input_shape=x_train[0].shape))
+    model.add(tf.keras.layers.Convolution2D(48,(1,1),input_shape=x_train[0].shape))
     model.add(tf.keras.layers.Activation('relu'))
 
 
-    model.add(tf.keras.layers.Convolution2D(32,(3,3)))
+    model.add(tf.keras.layers.Convolution2D(8,(3,3)))
     model.add(tf.keras.layers.Activation('relu'))
-    model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.Dropout(0.05))
 
 
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(24))
-    model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.Dense(100))
+    model.add(tf.keras.layers.Dropout(0.05))
 
 
     model.add(tf.keras.layers.Dense(nb_classes))

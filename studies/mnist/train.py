@@ -6,6 +6,7 @@ from tensorflow.keras.callbacks import TensorBoard
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
 def train():
   print(tf.__version__)
 
@@ -78,3 +79,6 @@ def train():
 
   model.save('models/'+NAME)
   
+
+  if __name__ == "__main__":
+    train()

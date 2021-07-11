@@ -1,11 +1,15 @@
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 from numpy.core.fromnumeric import argmax
 import tensorflow as tf
+tf.logging.set_verbosity(tf.logging.ERROR)
 from tensorflow import keras
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import math
+
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
