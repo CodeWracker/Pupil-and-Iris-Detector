@@ -45,7 +45,7 @@ def get_image_data(path_plk,path_image):
     
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = (img.reshape(80,120,1))
-    return x_iris,y_iris,r_pupil,r_iris,path_image.split('.png')[0],img
+    return x_iris,y_iris,r_pupil,r_iris,path_image.split('.png')[0],img,data['ldmks']['ldmks_iris_2d'],data['ldmks']['ldmks_pupil_2d']
 
 def save_df(x_iris,y_iris,r_pupil,r_iris,path_image):
     df = pd.DataFrame()
@@ -61,16 +61,18 @@ if __name__ == "__main__":
     files = os.listdir('./data')
     #print(files)
     i = 0
-    x_iris,y_iris,r_pupil,r_iris,path_image,imgs = [],[],[],[],[],[]
+    x_iris,y_iris,r_pupil,r_iris,path_image,imgs,iris_points,pupil_points = [],[],[],[],[],[],[],[]
     for i in tqdm(range(0,len(files)-1 ,2)):
         #print(files[i+1],files[i])
-        x,y,rp,ri,pi,img = get_image_data(files[i],files[i+1])
+        x,y,rp,ri,pi,img,iris_p,pupil_p = get_image_data(files[i],files[i+1])
         x_iris.append(x)
         y_iris.append(y)
         r_pupil.append(rp)
         r_iris.append(ri)
         path_image.append(pi)
         imgs.append(img)
+        iris_points.append(iris_p)
+        pupil_points.append(pupil_p)
         save_df(x_iris,y_iris,r_pupil,r_iris,path_image)
     
         dt = {
@@ -79,7 +81,9 @@ if __name__ == "__main__":
             "pupil_radius":  r_pupil ,
             "iris_radius":r_iris,
             "file_name": path_image,
-            "image": imgs }
+            "image": imgs,
+            "iris_points": iris_points,
+            "pupil_points":pupil_points }
 
         with open('./processed/results.pickle', 'wb') as handle:
             pickle.dump(dt, handle, protocol=pickle.HIGHEST_PROTOCOL)
