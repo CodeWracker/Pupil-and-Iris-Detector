@@ -48,7 +48,7 @@ class iris_detection():
 
 
 
-        col_count = np.zeros((290))
+        col_count = np.zeros((blurred.shape[1]))
         row_count = []
         for i in range(blurred.shape[0]):
             aux_row = 0
@@ -58,10 +58,12 @@ class iris_detection():
                 col_count[j] = col_count[j] + blurred[i][j]/blurred.shape[0]
             row_count.append(aux_row)
         cv2.imshow("Blurred", blurred)
-        print((col_count.shape))
-        print(np.array(row_count).shape)
-
-
+        for i in range(len(row_count)):
+            row_count[i] =( 255 -row_count[i])
+        for i in range(len(col_count)):
+            col_count[i] = (255 -col_count[i])
+        
+        row_count = np.array(row_count)
         
         x_col = np.arange(0.0, blurred.shape[1], 1)
         print(x_col.shape)
@@ -79,10 +81,26 @@ class iris_detection():
             title='Row Color count')
         row_ax.grid()
         plt.show()
+        row_count = row_count - row_count.min()
+        media_r = 0
+        for i,row in enumerate(row_count):
+            media_r+= row*i/row_count.sum()
+        desvio = 0
+        for i,row in enumerate(row_count):
+            if row>0:
+                desvio = media_r - i
+                break
+        col_count = col_count - col_count.min()
+        media_c = 0
+        for i,col in enumerate(col_count):
+            media_c+= col*i/col_count.sum()
+        print("x: ",media_c)
+        print("y: ",media_r)
+        print("raio: ",desvio)
 
+        #cv2.putText(self._img,'+',(int(media_c),int(media_r)),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
+        cv2.circle(self._img, (int(media_c),int(media_r)), int(desvio), (0, 0, 255), 2)
 
-        
-        plt.show()
 
         minDist = 1
         param1 = 20 # 500
@@ -96,6 +114,7 @@ class iris_detection():
         if circles is not None:
             circles = np.uint16(np.around(circles))
             for i in circles[0,:]:
+                print(i[0], i[1], i[2])
                 cv2.circle(self._img, (i[0], i[1]), i[2], (0, 255, 0), 2)
         print("HERE")
     def start_detection(self):
