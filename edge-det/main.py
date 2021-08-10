@@ -45,19 +45,20 @@ class iris_detection():
         blurred = cv2.bilateralFilter(o5,10,50,50)
         print(blurred.shape)
         
+        ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
+        cv2.imshow("Binario",bin_img)
 
 
-
-        col_count = np.zeros((blurred.shape[1]))
+        col_count = np.zeros((bin_img.shape[1]))
         row_count = []
-        for i in range(blurred.shape[0]):
+        for i in range(bin_img.shape[0]):
             aux_row = 0
             aux_col = 0
-            for j in range(blurred.shape[1]):
-                aux_row = aux_row + blurred[i][j]/blurred.shape[1]
-                col_count[j] = col_count[j] + blurred[i][j]/blurred.shape[0]
+            for j in range(bin_img.shape[1]):
+                aux_row = aux_row + bin_img[i][j]/bin_img.shape[1]
+                col_count[j] = col_count[j] + bin_img[i][j]/bin_img.shape[0]
             row_count.append(aux_row)
-        cv2.imshow("Blurred", blurred)
+        cv2.imshow("bin_img", bin_img)
         for i in range(len(row_count)):
             row_count[i] =( 255 -row_count[i])
         for i in range(len(col_count)):
@@ -65,7 +66,7 @@ class iris_detection():
         
         row_count = np.array(row_count)
         
-        x_col = np.arange(0.0, blurred.shape[1], 1)
+        x_col = np.arange(0.0, bin_img.shape[1], 1)
         print(x_col.shape)
         fig_c, col_ax = plt.subplots()
         col_ax.plot(x_col, col_count)
@@ -74,7 +75,7 @@ class iris_detection():
         col_ax.grid()
 
 
-        x_row = np.arange(0.0, blurred.shape[0], 1)
+        x_row = np.arange(0.0, bin_img.shape[0], 1)
         fig_r, row_ax = plt.subplots()
         row_ax.plot(x_row, row_count)
         row_ax.set(xlabel='Rows (s)', ylabel='Color Med',
@@ -85,21 +86,27 @@ class iris_detection():
         media_r = 0
         for i,row in enumerate(row_count):
             media_r+= row*i/row_count.sum()
-        desvio = 0
+        desvio_r = 0
         for i,row in enumerate(row_count):
             if row>0:
-                desvio = media_r - i
+                desvio_r = media_r - i
                 break
+        
         col_count = col_count - col_count.min()
         media_c = 0
         for i,col in enumerate(col_count):
             media_c+= col*i/col_count.sum()
+        desvio_c = 0
+        for i,col in enumerate(col_count):
+            if col>(0.45*col_count.max()):
+                desvio_c = media_c - i
+                break
         print("x: ",media_c)
         print("y: ",media_r)
-        print("raio: ",desvio)
+        print("raio: ",desvio_c,desvio_r)
 
         #cv2.putText(self._img,'+',(int(media_c),int(media_r)),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
-        cv2.circle(self._img, (int(media_c),int(media_r)), int(desvio), (0, 0, 255), 2)
+        cv2.ellipse(self._img, (int(media_c),int(media_r)), (int(desvio_c),int(desvio_r)),0,0,360, (0, 0, 255), 2)
 
 
         minDist = 1
@@ -109,7 +116,7 @@ class iris_detection():
         maxRadius = 300 #10
 
         # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles
-        circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
+        circles = cv2.HoughCircles(bin_img, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
 
         if circles is not None:
             circles = np.uint16(np.around(circles))
